@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiMOO | Your Personal AI Team</title>
+    <meta name="description" content="MiMoo gives you a personal AI backed by a team of agents and real humans. Inbox, calendar, research, scheduling, and follow-ups, handled from day one.">
+    <meta property="og:title" content="MiMOO | Your Personal AI Team">
+    <meta property="og:description" content="Meet your AI team. Inbox, calendar, bills, research, handled from day one. Over time, your agents learn your life and help you build things you've always imagined.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://mimoo.ai/og.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="theme-color" content="#3D4A2C">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐄</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --olive: #3D4A2C;
+            --cream: #FFF9F2;
+            --green: #7BA05B;
+            --green-light: rgba(123, 160, 91, 0.1);
+            --coral: #D4845A;
+            --coral-light: #E8A872;
+            --gold: #B8943E;
+            --gold-light: rgba(184, 148, 62, 0.1);
+            --sky: #B8DDE0;
+            --sky-deep: #8CC4C8;
+            --sky-light: rgba(184, 221, 224, 0.15);
+            --lime: #C8E86C;
+            --lime-dark: #8AAD2A;
+            --brown: #6B5D4F;
+            --r: 20px;
+            --r-lg: 28px;
+            --r-xl: 36px;
+            --shadow: 0 8px 32px rgba(61, 74, 44, 0.06), 0 2px 8px rgba(61, 74, 44, 0.04);
+            --shadow-lg: 0 16px 48px rgba(61, 74, 44, 0.1), 0 4px 16px rgba(61, 74, 44, 0.06);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--cream);
+            color: var(--olive);
+            line-height: 1.65;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(36px);
+            transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .reveal.vis { opacity: 1; transform: none; }
+        .d1 { transition-delay: .1s; }
+        .d2 { transition-delay: .2s; }
+        .d3 { transition-delay: .3s; }
+        .d4 { transition-delay: .4s; }
+        .d5 { transition-delay: .5s; }
+        .d6 { transition-delay: .6s; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to { opacity: 1; transform: none; }
+        }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: none; }
+        }
+
+        /* ===== SHARED ===== */
+        .section-tag {
+            display: inline-block;
+            padding: 5px 16px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.4px;
+            margin-bottom: 18px;
+        }
+        .tag-coral { background: rgba(212, 132, 90, 0.12); color: var(--coral); }
+        .tag-green { background: var(--green-light); color: var(--green); }
+        .tag-sky { background: var(--sky-light); color: var(--sky-deep); }
+        .tag-gold { background: var(--gold-light); color: var(--gold); }
+
+        .section-h2 {
+            font-family: 'Fraunces', serif;
+            font-size: clamp(30px, 5vw, 48px);
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            line-height: 1.08;
+            color: var(--olive);
+        }
+        .section-sub {
+            font-size: 17px;
+            color: var(--brown);
+            line-height: 1.7;
+            max-width: 560px;
+        }
+
+        /* ===== NAV ===== */
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 200;
+            padding: 0 40px; height: 68px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255, 249, 242, 0.7);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid transparent;
+            transition: all 0.4s;
+        }
+        nav.scrolled {
+            background: rgba(255, 249, 242, 0.95);
+            border-bottom-color: rgba(61, 74, 44, 0.06);
+            box-shadow: 0 2px 20px rgba(61, 74, 44, 0.04);
+        }
+        .nav-left {
+            display: flex; align-items: center; gap: 12px;
+            text-decoration: none;
+        }
+        .nav-left img {
+            width: 56px; height: 56px; object-fit: contain;
+            border-radius: 14px;
+        }
+        .nav-brand {
+            display: flex; flex-direction: column;
+        }
+        .nav-wordmark {
+            font-family: 'Fraunces', serif;
+            font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
+            color: var(--olive);
+            line-height: 1.1;
+        }
+        .nav-tagline {
+            font-size: 10px; font-weight: 600;
+            color: var(--brown);
+            letter-spacing: 0.8px;
+            opacity: 0.5;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+        .nav-right { display: flex; gap: 28px; align-items: center; }
+        .nav-right a {
+            text-decoration: none; font-size: 14px; font-weight: 500;
+            color: var(--brown); transition: color 0.3s;
+        }
+        .nav-right a:hover { color: var(--coral); }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 13px 28px; border-radius: 100px; font-size: 15px; font-weight: 700;
+            text-decoration: none; border: none; cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .btn-coral {
+            background: linear-gradient(135deg, var(--coral), var(--coral-light));
+            color: white;
+            box-shadow: 0 6px 24px rgba(212, 132, 90, 0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .btn-coral:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 36px rgba(212, 132, 90, 0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+        }
+        .btn-ghost {
+            background: transparent; color: var(--olive);
+            border: 1.5px solid rgba(61, 74, 44, 0.15);
+        }
+        .btn-ghost:hover {
+            border-color: var(--coral); color: var(--coral);
+            transform: translateY(-2px);
+        }
+        .btn-lg { padding: 17px 38px; font-size: 17px; }
+        .btn-sm { padding: 10px 22px; font-size: 13px; }
+
+        /* ===== HERO ===== */
+        .hero {
+            background: var(--cream);
+            padding: 130px 40px 36px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-blob {
+            position: absolute; border-radius: 50%;
+            pointer-events: none;
+        }
+        .hero-blob-1 {
+            width: 600px; height: 600px;
+            top: -10%; right: -5%;
+            background: rgba(123, 160, 91, 0.06);
+            filter: blur(100px);
+        }
+        .hero-blob-2 {
+            width: 450px; height: 450px;
+            bottom: 0%; left: -8%;
+            background: rgba(212, 132, 90, 0.05);
+            filter: blur(90px);
+        }
+        .hero-blob-3 {
+            width: 350px; height: 350px;
+            top: 30%; left: 40%;
+            background: rgba(184, 221, 224, 0.06);
+            filter: blur(80px);
+        }
+        .hero-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; align-items: center; gap: 48px;
+            position: relative; z-index: 1;
+        }
+        .hero-text { flex: 1; }
+        .hero-mascot {
+            flex: 0 0 44%;
+            text-align: center;
+        }
+        .hero-mascot img {
+            max-width: 100%; height: auto; max-height: 560px;
+            animation: float 6s ease-in-out infinite;
+            filter: drop-shadow(0 20px 40px rgba(61, 74, 44, 0.1));
+        }
+
+        .hero h1 {
+            font-family: 'Fraunces', serif;
+            font-size: clamp(42px, 7vw, 76px);
+            line-height: 1.04;
+            font-weight: 900;
+            letter-spacing: -3px;
+            margin-bottom: 24px;
+            animation: fadeUp 0.9s cubic-bezier(.22,1,.36,1) .2s both;
+        }
+        .hero-sub {
+            font-size: clamp(16px, 1.8vw, 19px);
+            line-height: 1.75;
+            color: var(--brown);
+            max-width: 520px;
+            margin-bottom: 16px;
+            animation: fadeUp 0.9s cubic-bezier(.22,1,.36,1) .35s both;
+        }
+        .hero-note {
+            font-size: 14px; font-weight: 600;
+            color: var(--green);
+            margin-bottom: 24px;
+            animation: fadeUp 0.9s cubic-bezier(.22,1,.36,1) .45s both;
+        }
+        .hero-ctas {
+            display: flex; gap: 14px; flex-wrap: wrap;
+            animation: fadeUp 0.9s cubic-bezier(.22,1,.36,1) .55s both;
+        }
+
+        /* ===== TRUST STRIP ===== */
+        .trust-strip {
+            padding: 14px 24px;
+            background: white;
+            border-bottom: 1px solid rgba(61, 74, 44, 0.04);
+        }
+        .trust-strip-inner {
+            max-width: 1000px; margin: 0 auto;
+            display: flex; justify-content: center; align-items: center;
+            gap: 12px; flex-wrap: wrap;
+        }
+        .ts-item {
+            font-size: 13px; font-weight: 600;
+            color: var(--brown);
+            display: flex; align-items: center; gap: 6px;
+            padding: 0 16px;
+        }
+        .ts-item .ts-icon {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--green);
+        }
+        .ts-divider {
+            width: 1px; height: 16px;
+            background: rgba(61, 74, 44, 0.1);
+        }
+
+        /* ===== HUB SECTION ===== */
+        .hub-s {
+            padding: 100px 24px;
+            background: var(--cream);
+        }
+        .hub-inner { max-width: 1000px; margin: 0 auto; }
+        .hub-head {
+            text-align: center; margin-bottom: 48px;
+        }
+        .hub-head .section-sub { margin: 16px auto 0; }
+
+        .org-chart {
+            max-width: 920px;
+            margin: 0 auto 36px;
+        }
+        .org-lead {
+            text-align: center;
+            margin-bottom: 0;
+        }
+        .org-lead-card {
+            display: inline-flex;
+            align-items: center;
+            gap: 20px;
+            background: white;
+            border-radius: var(--r-xl);
+            padding: 20px 36px;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid rgba(123, 160, 91, 0.12);
+        }
+        .org-lead-card img {
+            width: 72px; height: 72px;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+        .org-lead-card .org-lead-fallback {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--green-light), rgba(212, 132, 90, 0.08));
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Fraunces', serif;
+            font-size: 28px; font-weight: 900;
+            color: var(--olive);
+        }
+        .org-lead-info { text-align: left; }
+        .org-lead-info h3 {
+            font-family: 'Fraunces', serif;
+            font-size: 22px; font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--olive);
+            line-height: 1.2;
+        }
+        .org-lead-info p {
+            font-size: 13px; color: var(--brown);
+            font-weight: 500;
+        }
+
+        .org-connector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .org-trunk {
+            width: 2px;
+            height: 28px;
+            background: rgba(123, 160, 91, 0.3);
+        }
+        .org-branches {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            padding: 0 12.5%;
+            border-top: 2px solid rgba(123, 160, 91, 0.3);
+        }
+        .org-branches span {
+            display: block;
+            width: 2px;
+            height: 16px;
+            background: rgba(123, 160, 91, 0.3);
+        }
+
+        .org-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+        .org-card {
+            background: white;
+            border-radius: var(--r);
+            padding: 22px 16px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(61, 74, 44, 0.04);
+            transition: all 0.35s cubic-bezier(.22,1,.36,1);
+        }
+        .org-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        .org-card .oc-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            margin: 0 auto 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px;
+            background: var(--cream);
+        }
+        .org-card h4 {
+            font-size: 14px; font-weight: 700;
+            color: var(--olive);
+            margin-bottom: 4px;
+        }
+        .org-card p {
+            font-size: 12px; line-height: 1.45;
+            color: var(--brown);
+        }
+
+        .hub-bottom {
+            text-align: center;
+            font-size: 16px; color: var(--brown);
+            max-width: 520px; margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ===== BRIEFING SECTION ===== */
+        .brief-s {
+            padding: 100px 24px;
+            background: white;
+        }
+        .brief-inner { max-width: 900px; margin: 0 auto; }
+        .brief-head {
+            text-align: center; margin-bottom: 48px;
+        }
+        .brief-head .section-sub { margin: 16px auto 0; }
+
+        .briefing-card {
+            background: var(--olive);
+            border-radius: var(--r-xl);
+            padding: 36px 40px;
+            color: white;
+            max-width: 640px;
+            margin: 0 auto 36px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+        .briefing-card::after {
+            content: ''; position: absolute;
+            top: -60px; right: -60px;
+            width: 250px; height: 250px;
+            background: radial-gradient(circle, rgba(123, 160, 91, 0.12), transparent 70%);
+            pointer-events: none;
+        }
+        .bc-header {
+            display: flex; align-items: center; gap: 10px;
+            font-size: 12px; font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 0.5px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            position: relative; z-index: 1;
+        }
+        .bc-header .bc-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--lime);
+            animation: pulse 2s infinite;
+        }
+        .brief-line {
+            display: flex; gap: 14px; align-items: flex-start;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 14px; line-height: 1.55;
+            color: rgba(255,255,255,0.8);
+            position: relative; z-index: 1;
+            opacity: 0;
+            transform: translateX(-16px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .brief-line .bl-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+        .briefing-card.animate .brief-line {
+            opacity: 1; transform: none;
+        }
+        .briefing-card.animate .brief-line:nth-child(1) { transition-delay: 0.15s; }
+        .briefing-card.animate .brief-line:nth-child(2) { transition-delay: 0.3s; }
+        .briefing-card.animate .brief-line:nth-child(3) { transition-delay: 0.45s; }
+        .briefing-card.animate .brief-line:nth-child(4) { transition-delay: 0.6s; }
+        .briefing-card.animate .brief-line:nth-child(5) { transition-delay: 0.75s; }
+        .briefing-card.animate .brief-line:nth-child(6) { transition-delay: 0.9s; }
+
+        .bc-footer {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 20px; padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            font-size: 13px; font-weight: 600;
+            position: relative; z-index: 1;
+            opacity: 0;
+            transition: opacity 0.5s ease 1.1s;
+        }
+        .briefing-card.animate .bc-footer { opacity: 1; }
+        .bc-footer .bc-time { color: rgba(255,255,255,0.35); }
+        .bc-footer .bc-saved {
+            color: var(--lime);
+            background: rgba(200, 232, 108, 0.1);
+            padding: 4px 14px; border-radius: 100px;
+        }
+
+        .brief-bottom {
+            text-align: center;
+            font-size: 16px; color: var(--brown);
+            max-width: 480px; margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ===== PACKAGES SECTION ===== */
+        .pkg-s {
+            padding: 100px 24px;
+            background: var(--cream);
+        }
+        .pkg-inner { max-width: 1100px; margin: 0 auto; }
+        .pkg-head {
+            text-align: center; margin-bottom: 20px;
+        }
+        .pkg-head .section-sub { margin: 16px auto 0; max-width: 620px; }
+
+        .pkg-tabs {
+            display: flex; justify-content: center;
+            gap: 8px; flex-wrap: wrap;
+            margin: 40px 0 28px;
+        }
+        .pkg-tab {
+            display: flex; align-items: center; gap: 8px;
+            padding: 12px 22px; border-radius: 100px;
+            font-size: 14px; font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            border: 1.5px solid rgba(61, 74, 44, 0.1);
+            background: white;
+            color: var(--brown);
+            transition: all 0.3s;
+        }
+        .pkg-tab:hover { border-color: var(--coral); color: var(--olive); }
+        .pkg-tab.active {
+            background: linear-gradient(135deg, var(--coral), var(--coral-light));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 16px rgba(212, 132, 90, 0.25);
+        }
+        .pkg-tab span { font-size: 18px; }
+
+        .pkg-content {
+            display: none;
+            background: white;
+            border-radius: var(--r-xl);
+            padding: 44px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(61, 74, 44, 0.04);
+        }
+        .pkg-content.active {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 44px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .pkg-left .pkg-emoji { font-size: 36px; margin-bottom: 12px; }
+        .pkg-left h3 {
+            font-family: 'Fraunces', serif;
+            font-size: 32px; font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 6px;
+        }
+        .pkg-left .pkg-for {
+            font-size: 14px; font-style: italic;
+            color: var(--coral); font-weight: 500;
+            margin-bottom: 16px;
+        }
+        .pkg-left .pkg-desc {
+            font-size: 15px; line-height: 1.7;
+            color: var(--brown);
+            margin-bottom: 28px;
+        }
+        .pkg-ctas {
+            display: flex; gap: 12px;
+        }
+
+        .pkg-right { display: flex; flex-direction: column; gap: 28px; }
+        .pkg-list h4 {
+            font-size: 13px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1.2px;
+            color: var(--olive);
+            margin-bottom: 14px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .pkg-list h4::before {
+            content: '';
+            width: 20px; height: 2px;
+            background: var(--coral);
+            border-radius: 2px;
+        }
+        .pkg-list.build-list h4::before { background: var(--green); }
+        .pkg-list ul {
+            list-style: none;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .pkg-list li {
+            font-size: 14px; line-height: 1.55;
+            color: var(--brown);
+            display: flex; gap: 10px;
+            padding-left: 2px;
+        }
+        .pkg-list li .ck {
+            flex-shrink: 0; font-weight: 700;
+            color: var(--green);
+        }
+        .pkg-list.build-list li .ck { color: var(--coral); }
+
+        .pkg-bottom {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 16px; color: var(--brown);
+        }
+        .pkg-bottom a { color: var(--coral); font-weight: 600; text-decoration: none; }
+
+        /* ===== BUILDER SECTION ===== */
+        .build-s {
+            padding: 100px 24px;
+            background: white;
+            position: relative; overflow: hidden;
+        }
+        .build-s::before {
+            content: ''; position: absolute;
+            top: -200px; right: -150px;
+            width: 500px; height: 500px;
+            background: rgba(200, 232, 108, 0.06);
+            border-radius: 50%; filter: blur(80px);
+            pointer-events: none;
+        }
+        .build-inner {
+            max-width: 1000px; margin: 0 auto;
+            position: relative; z-index: 1;
+        }
+        .build-head {
+            text-align: center; margin-bottom: 48px;
+        }
+        .build-head .section-sub { margin: 16px auto 0; max-width: 580px; }
+
+        .build-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .build-card {
+            background: var(--cream);
+            border-radius: var(--r-lg);
+            padding: 32px 28px;
+            transition: all 0.35s cubic-bezier(.22,1,.36,1);
+            border: 1px solid rgba(61, 74, 44, 0.04);
+        }
+        .build-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow);
+        }
+        .build-card .bci {
+            font-size: 28px; margin-bottom: 14px;
+        }
+        .build-card h4 {
+            font-family: 'Fraunces', serif;
+            font-size: 18px; font-weight: 800;
+            letter-spacing: -0.3px;
+            margin-bottom: 8px;
+        }
+        .build-card p {
+            font-size: 14px; line-height: 1.6;
+            color: var(--brown);
+        }
+
+        .build-bottom {
+            text-align: center;
+            font-size: 16px; color: var(--brown);
+            font-style: italic;
+            max-width: 480px; margin: 0 auto;
+        }
+
+        /* ===== GET AHEAD SECTION ===== */
+        .ahead-s {
+            padding: 100px 24px;
+            background: var(--olive);
+            color: white;
+            position: relative; overflow: hidden;
+        }
+        .ahead-s::after {
+            content: ''; position: absolute; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+            background-size: 256px; opacity: 0.3;
+            pointer-events: none;
+        }
+        .ahead-inner {
+            max-width: 700px; margin: 0 auto;
+            text-align: center;
+            position: relative; z-index: 1;
+        }
+        .ahead-inner .section-h2 { color: white; margin-bottom: 28px; }
+        .ahead-inner p {
+            font-size: 17px; line-height: 1.8;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 16px;
+        }
+        .ahead-inner p strong {
+            color: rgba(255,255,255,0.85);
+            font-weight: 600;
+        }
+        .ahead-inner .ahead-sign {
+            font-family: 'Fraunces', serif;
+            font-size: 22px; font-weight: 700;
+            font-style: italic;
+            color: var(--coral-light);
+            margin: 32px 0 40px;
+        }
+
+        /* ===== PRICING SECTION ===== */
+        .price-s {
+            padding: 100px 24px;
+            background: var(--cream);
+        }
+        .price-inner { max-width: 560px; margin: 0 auto; }
+        .price-head {
+            text-align: center; margin-bottom: 48px;
+        }
+        .price-head .section-sub { margin: 16px auto 0; }
+
+        .price-card {
+            background: white;
+            border-radius: var(--r-xl);
+            padding: 52px 44px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(61, 74, 44, 0.04);
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .pc-amount {
+            font-family: 'Fraunces', serif;
+            font-size: 64px; font-weight: 900;
+            color: var(--olive);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .pc-label {
+            font-size: 15px; font-weight: 700;
+            color: var(--brown);
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 20px;
+        }
+        .pc-desc {
+            font-size: 15px; line-height: 1.7;
+            color: var(--brown);
+            max-width: 400px; margin: 0 auto 24px;
+        }
+        .pc-divider {
+            width: 60px; height: 2px;
+            background: linear-gradient(90deg, var(--coral), var(--coral-light));
+            margin: 0 auto 24px;
+            border-radius: 2px;
+        }
+        .pc-monthly-note {
+            font-size: 15px; line-height: 1.7;
+            color: var(--olive);
+            font-weight: 500;
+            margin-bottom: 28px;
+        }
+        .pc-features {
+            list-style: none;
+            display: flex; flex-direction: column; gap: 12px;
+            margin-bottom: 32px;
+            text-align: left;
+        }
+        .pc-features li {
+            font-size: 14px; line-height: 1.55;
+            color: var(--brown);
+            display: flex; gap: 10px;
+        }
+        .pc-features li .ck {
+            flex-shrink: 0; font-weight: 700;
+            color: var(--green);
+        }
+
+        .price-fine {
+            text-align: center;
+            font-size: 12px; color: var(--brown);
+            opacity: 0.6;
+        }
+
+        /* ===== TRUST SECTION ===== */
+        .trust-s {
+            padding: 100px 24px;
+            background: linear-gradient(160deg, #E8F4F5 0%, var(--sky) 50%, #D4ECE5 100%);
+            position: relative; overflow: hidden;
+        }
+        .trust-s::after {
+            content: ''; position: absolute; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+            background-size: 256px; opacity: 0.4;
+            pointer-events: none;
+        }
+        .trust-inner {
+            max-width: 1000px; margin: 0 auto;
+            position: relative; z-index: 1;
+        }
+        .trust-head {
+            text-align: center; margin-bottom: 48px;
+        }
+        .trust-head .section-h2 { color: var(--olive); }
+
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+        }
+        .trust-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            border-radius: var(--r-lg);
+            padding: 28px 22px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.3s;
+        }
+        .trust-card:hover {
+            background: rgba(255, 255, 255, 0.85);
+            transform: translateY(-4px);
+        }
+        .trust-card .tc-icon {
+            font-size: 28px; margin-bottom: 14px;
+        }
+        .trust-card h4 {
+            font-size: 14px; font-weight: 800;
+            color: var(--olive);
+            margin-bottom: 6px;
+        }
+        .trust-card p {
+            font-size: 12px; line-height: 1.55;
+            color: var(--brown);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            padding: 44px 24px;
+            background: var(--olive);
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+        }
+        .foot-logo {
+            display: flex; align-items: center; justify-content: center;
+            gap: 14px; margin-bottom: 16px;
+        }
+        .foot-logo img {
+            width: 60px; height: 60px;
+            object-fit: contain; border-radius: 14px;
+        }
+        .foot-brand {
+            display: flex; flex-direction: column;
+            text-align: left;
+        }
+        .foot-mark {
+            font-family: 'Fraunces', serif;
+            font-size: 26px; font-weight: 800;
+            color: white; letter-spacing: -0.5px;
+            line-height: 1.1;
+        }
+        .foot-sub {
+            font-size: 11px; font-weight: 600;
+            color: rgba(255,255,255,0.3);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+        .foot-nav {
+            display: flex; justify-content: center;
+            gap: 24px; flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .foot-nav a {
+            font-size: 13px; color: rgba(255,255,255,0.45);
+            text-decoration: none; transition: color 0.2s;
+        }
+        .foot-nav a:hover { color: var(--coral-light); }
+        .foot-copy { font-size: 13px; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 960px) {
+            .hero-inner { flex-direction: column-reverse; text-align: center; gap: 32px; }
+            .hero-mascot { flex: none; }
+            .hero-mascot img { max-height: 380px; }
+            .hero-sub { margin-left: auto; margin-right: auto; }
+            .hero-ctas { justify-content: center; }
+            .org-grid { grid-template-columns: repeat(3, 1fr); }
+            .org-branches { padding: 0 16.7%; }
+            .org-branches span:nth-child(4) { display: none; }
+            .pkg-content.active { grid-template-columns: 1fr; gap: 32px; }
+            .build-grid { grid-template-columns: repeat(2, 1fr); }
+            .trust-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            .nav-right a:not(.btn) { display: none; }
+            .hero { padding: 100px 20px 32px; }
+            .hero h1 { letter-spacing: -1.5px; }
+            .hub-s, .brief-s, .pkg-s, .build-s, .ahead-s, .price-s, .trust-s {
+                padding: 72px 20px;
+            }
+            .org-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .org-connector { display: none; }
+            .org-lead { margin-bottom: 20px; }
+            .org-lead-card { padding: 16px 24px; gap: 14px; }
+            .org-lead-card img { width: 56px; height: 56px; }
+            .org-card { padding: 18px 14px; }
+            .org-card .oc-icon { width: 38px; height: 38px; font-size: 18px; }
+            .pkg-tabs { gap: 6px; }
+            .pkg-tab { padding: 10px 16px; font-size: 13px; }
+            .pkg-content { padding: 28px 20px; }
+            .briefing-card { padding: 28px 24px; }
+            .trust-grid { grid-template-columns: 1fr 1fr; }
+            .ts-divider { display: none; }
+            .trust-strip-inner { gap: 8px; }
+            .ts-item { font-size: 12px; padding: 0 8px; }
+            .price-card { padding: 40px 28px; }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 36px; letter-spacing: -1px; }
+            .hero-ctas { flex-direction: column; align-items: center; }
+            .hero-ctas .btn { width: 100%; max-width: 300px; }
+            .hero-mascot img { max-height: 260px; }
+            .org-lead-card { flex-direction: column; text-align: center; padding: 20px; }
+            .org-lead-info { text-align: center; }
+            .build-grid { grid-template-columns: 1fr; }
+            .pkg-tabs { flex-direction: column; align-items: stretch; }
+            .pkg-tab { justify-content: center; }
+            .pkg-ctas { flex-direction: column; }
+            .trust-grid { grid-template-columns: 1fr; }
+            .briefing-card { border-radius: var(--r-lg); }
+            .pc-amount { font-size: 52px; }
+            .nav-tagline { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+    <a href="#" class="nav-left">
+        <img src="mascot.png" alt="MiMoo" onerror="this.style.display='none'">
+        <div class="nav-brand">
+            <span class="nav-wordmark">MiMOO</span>
+            <span class="nav-tagline">Udderly Reliable</span>
+        </div>
+    </a>
+    <div class="nav-right">
+        <a href="#how">How It Works</a>
+        <a href="#packages">Packages</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#pricing" class="btn btn-coral btn-sm">Get Started</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-blob hero-blob-1"></div>
+    <div class="hero-blob hero-blob-2"></div>
+    <div class="hero-blob hero-blob-3"></div>
+
+    <div class="hero-inner">
+        <div class="hero-text">
+            <h1>Meet your<br>AI team.</h1>
+            <p class="hero-sub">MiMoo gives you a personal AI backed by a team of agents and real humans. Your inbox, calendar, research, scheduling, and follow-ups are handled from day one. Over time, your agents learn your life and help you build things you&rsquo;ve always imagined.</p>
+            <p class="hero-note">No tech skills. No setup. No learning curve.</p>
+            <div class="hero-ctas">
+                <a href="#pricing" class="btn btn-coral btn-lg">Get Started</a>
+                <a href="#how" class="btn btn-ghost btn-lg">See How It Works &darr;</a>
+            </div>
+        </div>
+        <div class="hero-mascot">
+            <img src="mascot.png" alt="MiMoo, wise cow mascot with glasses" onerror="this.parentElement.style.display='none'">
+        </div>
+    </div>
+</section>
+
+<!-- TRUST STRIP -->
+<div class="trust-strip">
+    <div class="trust-strip-inner">
+        <div class="ts-item"><span class="ts-icon"></span> Setup done for you</div>
+        <div class="ts-divider"></div>
+        <div class="ts-item"><span class="ts-icon"></span> Real humans behind the scenes</div>
+        <div class="ts-divider"></div>
+        <div class="ts-item"><span class="ts-icon"></span> Your data stays yours</div>
+        <div class="ts-divider"></div>
+        <div class="ts-item"><span class="ts-icon"></span> Cancel anytime</div>
+    </div>
+</div>
+
+<!-- YOUR AI TEAM — HUB -->
+<section class="hub-s" id="how">
+    <div class="hub-inner">
+        <div class="hub-head reveal">
+            <div class="section-tag tag-green">How It Works</div>
+            <h2 class="section-h2">One AI. A whole team<br>of agents.</h2>
+            <p class="section-sub">You talk to MiMoo. Behind the scenes, a team of specialized agents handles everything: an inbox manager, a researcher, a writer, a scheduler, a developer, and more. You never see the complexity. You just see results.</p>
+        </div>
+
+        <div class="org-chart reveal">
+            <div class="org-lead">
+                <div class="org-lead-card">
+                    <img src="mascot.png" alt="MiMoo" onerror="this.outerHTML='<div class=org-lead-fallback>M</div>'">
+                    <div class="org-lead-info">
+                        <h3>MiMoo</h3>
+                        <p>Your AI Team Lead</p>
+                    </div>
+                </div>
+            </div>
+            <div class="org-connector" aria-hidden="true">
+                <div class="org-trunk"></div>
+                <div class="org-branches">
+                    <span></span><span></span><span></span><span></span>
+                </div>
+            </div>
+            <div class="org-grid">
+                <div class="org-card">
+                    <div class="oc-icon">&#128231;</div>
+                    <h4>Inbox Manager</h4>
+                    <p>Sorts, drafts, and prioritizes your email</p>
+                </div>
+                <div class="org-card">
+                    <div class="oc-icon">&#128197;</div>
+                    <h4>Schedule Keeper</h4>
+                    <p>Manages your calendar and resolves conflicts</p>
+                </div>
+                <div class="org-card">
+                    <div class="oc-icon">&#128270;</div>
+                    <h4>Research Analyst</h4>
+                    <p>Finds answers, data, and competitive intel</p>
+                </div>
+                <div class="org-card">
+                    <div class="oc-icon">&#9997;&#65039;</div>
+                    <h4>Copywriter</h4>
+                    <p>Writes in your voice across every channel</p>
+                </div>
+                <div class="org-card">
+                    <div class="oc-icon">&#128176;</div>
+                    <h4>Finance Tracker</h4>
+                    <p>Monitors bills, expenses, and budgets</p>
+                </div>
+                <div class="org-card">
+                    <div class="oc-icon">&#128295;</div>
+                    <h4>Builder</h4>
+                    <p>Turns your ideas into websites, apps, and tools</p>
+                </div>
+                <div class="org-card">
+                    <div class="oc-icon">&#128202;</div>
+                    <h4>Daily Briefer</h4>
+                    <p>Prepares your morning overview and reports</p>
+                </div>
+                <div class="org-card">
+                    <div class="oc-icon">&#129309;</div>
+                    <h4>Follow-up Agent</h4>
+                    <p>Tracks commitments and sends reminders</p>
+                </div>
+                <div class="org-card">
+                    <div class="oc-icon">&#128101;</div>
+                    <h4>CRM Manager</h4>
+                    <p>Remembers relationships and key contacts</p>
+                </div>
+                <div class="org-card">
+                    <div class="oc-icon">&#129504;</div>
+                    <h4>Thought Partner</h4>
+                    <p>Helps you think through decisions</p>
+                </div>
+                <div class="org-card">
+                    <div class="oc-icon">&#9992;&#65039;</div>
+                    <h4>Travel Planner</h4>
+                    <p>Books trips and handles logistics</p>
+                </div>
+                <div class="org-card">
+                    <div class="oc-icon">&#9989;</div>
+                    <h4>Task Manager</h4>
+                    <p>Tracks to-dos and keeps projects moving</p>
+                </div>
+            </div>
+        </div>
+
+        <p class="hub-bottom reveal">You don&rsquo;t manage agents. You don&rsquo;t configure anything. You just talk to MiMoo by text, email, or call, and the right agent handles it.</p>
+    </div>
+</section>
+
+<!-- DAY ONE IMPACT -->
+<section class="brief-s">
+    <div class="brief-inner">
+        <div class="brief-head reveal">
+            <div class="section-tag tag-coral">Day One Impact</div>
+            <h2 class="section-h2">Results before your<br>first coffee.</h2>
+            <p class="section-sub">Nobody needs to come with a plan. Your agents start working the moment they&rsquo;re live.</p>
+        </div>
+
+        <div class="briefing-card reveal" id="briefing">
+            <div class="bc-header">
+                <span class="bc-dot"></span>
+                MiMoo &middot; Daily Briefing &middot; Today at 6:00 AM
+            </div>
+            <div class="brief-line">
+                <span class="bl-icon">&#128236;</span>
+                <span>3 urgent emails flagged. Draft responses ready for your review.</span>
+            </div>
+            <div class="brief-line">
+                <span class="bl-icon">&#128197;</span>
+                <span>Calendar conflict resolved. Tuesday 2pm moved to 3:30pm.</span>
+            </div>
+            <div class="brief-line">
+                <span class="bl-icon">&#128276;</span>
+                <span>5 follow-ups due today. Including board deck for Sarah (3 days overdue).</span>
+            </div>
+            <div class="brief-line">
+                <span class="bl-icon">&#128240;</span>
+                <span>12 newsletters auto-sorted. Here&rsquo;s the 1 that matters.</span>
+            </div>
+            <div class="brief-line">
+                <span class="bl-icon">&#128179;</span>
+                <span>Electric bill due in 3 days. Reminder set.</span>
+            </div>
+            <div class="brief-line">
+                <span class="bl-icon">&#128202;</span>
+                <span>Your 10am meeting prepped. Attendee context and agenda ready.</span>
+            </div>
+            <div class="bc-footer">
+                <span class="bc-time">10 minutes to review</span>
+                <span class="bc-saved">87 minutes saved</span>
+            </div>
+        </div>
+
+        <p class="brief-bottom reveal">This happens on day one. No setup from you. No learning curve. Your AI team is already working.</p>
+    </div>
+</section>
+
+<!-- PACKAGES -->
+<section class="pkg-s" id="packages">
+    <div class="pkg-inner">
+        <div class="pkg-head reveal">
+            <div class="section-tag tag-gold">Identity Packages</div>
+            <h2 class="section-h2">Tell us who you are.<br>We&rsquo;ll build your team.</h2>
+            <p class="section-sub">Every package includes your full AI team: inbox, calendar, briefings, research, follow-ups, and the ability to build whatever you can imagine. Pick the one that fits your life.</p>
+        </div>
+
+        <div class="pkg-tabs reveal">
+            <button class="pkg-tab active" data-pkg="operator"><span>&#9889;</span> The Operator</button>
+            <button class="pkg-tab" data-pkg="business"><span>&#127970;</span> Business Owner</button>
+            <button class="pkg-tab" data-pkg="household"><span>&#127968;</span> Household CEO</button>
+            <button class="pkg-tab" data-pkg="investor"><span>&#128200;</span> Investor</button>
+            <button class="pkg-tab" data-pkg="creator"><span>&#127919;</span> Creator</button>
+        </div>
+
+        <!-- THE OPERATOR -->
+        <div class="pkg-content active" id="pkg-operator">
+            <div class="pkg-left">
+                <div class="pkg-emoji">&#9889;</div>
+                <h3>The Operator</h3>
+                <p class="pkg-for">For professionals, executives, and anyone with a demanding career.</p>
+                <p class="pkg-desc">You&rsquo;re running meetings, managing teams, and drowning in email. Your AI team handles the operational noise so you focus on the work that matters.</p>
+                <div class="pkg-ctas">
+                    <a href="#pricing" class="btn btn-coral">Get Started</a>
+                    <a href="#book-call" class="btn btn-ghost">Book a Call</a>
+                </div>
+            </div>
+            <div class="pkg-right">
+                <div class="pkg-list">
+                    <h4>Your agents handle:</h4>
+                    <ul>
+                        <li><span class="ck">&#10003;</span> Inbox sorted and prioritized with draft responses</li>
+                        <li><span class="ck">&#10003;</span> Calendar optimized. Conflicts resolved, buffer time protected</li>
+                        <li><span class="ck">&#10003;</span> Meeting prep with attendee context and agendas</li>
+                        <li><span class="ck">&#10003;</span> Follow-up tracking. Every commitment remembered</li>
+                        <li><span class="ck">&#10003;</span> Research on demand: competitive analysis, market data</li>
+                    </ul>
+                </div>
+                <div class="pkg-list build-list">
+                    <h4>What you and your agents can build:</h4>
+                    <ul>
+                        <li><span class="ck">&#10003;</span> Custom dashboards for your team</li>
+                        <li><span class="ck">&#10003;</span> Internal tools and workflows</li>
+                        <li><span class="ck">&#10003;</span> Client portals</li>
+                        <li><span class="ck">&#10003;</span> Automated reporting systems</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- BUSINESS OWNER -->
+        <div class="pkg-content" id="pkg-business">
+            <div class="pkg-left">
+                <div class="pkg-emoji">&#127970;</div>
+                <h3>The Business Owner</h3>
+                <p class="pkg-for">For founders, small business operators, and anyone wearing every hat.</p>
+                <p class="pkg-desc">You run the business AND you&rsquo;re in the business. Your AI team handles the back office so you can focus on growth.</p>
+                <div class="pkg-ctas">
+                    <a href="#pricing" class="btn btn-coral">Get Started</a>
+                    <a href="#book-call" class="btn btn-ghost">Book a Call</a>
+                </div>
+            </div>
+            <div class="pkg-right">
+                <div class="pkg-list">
+                    <h4>Your agents handle:</h4>
+                    <ul>
+                        <li><span class="ck">&#10003;</span> Invoicing and payment reminders</li>
+                        <li><span class="ck">&#10003;</span> Customer review responses in your voice</li>
+                        <li><span class="ck">&#10003;</span> Employee scheduling and conflict detection</li>
+                        <li><span class="ck">&#10003;</span> Vendor and supplier tracking</li>
+                        <li><span class="ck">&#10003;</span> Revenue and expense summaries</li>
+                    </ul>
+                </div>
+                <div class="pkg-list build-list">
+                    <h4>What you and your agents can build:</h4>
+                    <ul>
+                        <li><span class="ck">&#10003;</span> A website or online store for your business</li>
+                        <li><span class="ck">&#10003;</span> Booking and scheduling systems</li>
+                        <li><span class="ck">&#10003;</span> Customer management tools</li>
+                        <li><span class="ck">&#10003;</span> Multi-platform selling automations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- HOUSEHOLD CEO -->
+        <div class="pkg-content" id="pkg-household">
+            <div class="pkg-left">
+                <div class="pkg-emoji">&#127968;</div>
+                <h3>The Household CEO</h3>
+                <p class="pkg-for">For busy parents, families, and anyone managing a household.</p>
+                <p class="pkg-desc">Three kids, twelve activities, and a house that runs on logistics. Your AI team manages the chaos so you can be present.</p>
+                <div class="pkg-ctas">
+                    <a href="#pricing" class="btn btn-coral">Get Started</a>
+                    <a href="#book-call" class="btn btn-ghost">Book a Call</a>
+                </div>
+            </div>
+            <div class="pkg-right">
+                <div class="pkg-list">
+                    <h4>Your agents handle:</h4>
+                    <ul>
+                        <li><span class="ck">&#10003;</span> Family calendar. Every kid, every activity, every conflict resolved</li>
+                        <li><span class="ck">&#10003;</span> Meal planning and grocery lists</li>
+                        <li><span class="ck">&#10003;</span> Travel coordination and booking</li>
+                        <li><span class="ck">&#10003;</span> Home vendor and service tracking</li>
+                        <li><span class="ck">&#10003;</span> Household budget intelligence</li>
+                    </ul>
+                </div>
+                <div class="pkg-list build-list">
+                    <h4>What you and your agents can build:</h4>
+                    <ul>
+                        <li><span class="ck">&#10003;</span> A family coordination app</li>
+                        <li><span class="ck">&#10003;</span> Neighborhood group platforms</li>
+                        <li><span class="ck">&#10003;</span> Custom planning tools</li>
+                        <li><span class="ck">&#10003;</span> Automated household systems</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- INVESTOR -->
+        <div class="pkg-content" id="pkg-investor">
+            <div class="pkg-left">
+                <div class="pkg-emoji">&#128200;</div>
+                <h3>The Investor</h3>
+                <p class="pkg-for">For portfolio managers, fund operators, and anyone managing capital.</p>
+                <p class="pkg-desc">Your money works hard. Your AI team makes sure you never miss a signal, a deadline, or an opportunity.</p>
+                <div class="pkg-ctas">
+                    <a href="#pricing" class="btn btn-coral">Get Started</a>
+                    <a href="#book-call" class="btn btn-ghost">Book a Call</a>
+                </div>
+            </div>
+            <div class="pkg-right">
+                <div class="pkg-list">
+                    <h4>Your agents handle:</h4>
+                    <ul>
+                        <li><span class="ck">&#10003;</span> Investment briefings and market alerts</li>
+                        <li><span class="ck">&#10003;</span> Expense oversight and categorization</li>
+                        <li><span class="ck">&#10003;</span> Tax prep summaries and documentation</li>
+                        <li><span class="ck">&#10003;</span> Capital event reminders</li>
+                        <li><span class="ck">&#10003;</span> Financial snapshot reports</li>
+                    </ul>
+                </div>
+                <div class="pkg-list build-list">
+                    <h4>What you and your agents can build:</h4>
+                    <ul>
+                        <li><span class="ck">&#10003;</span> Custom portfolio dashboards</li>
+                        <li><span class="ck">&#10003;</span> Deal flow tracking tools</li>
+                        <li><span class="ck">&#10003;</span> LP reporting systems</li>
+                        <li><span class="ck">&#10003;</span> Market monitoring automations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- CREATOR -->
+        <div class="pkg-content" id="pkg-creator">
+            <div class="pkg-left">
+                <div class="pkg-emoji">&#127919;</div>
+                <h3>The Creator</h3>
+                <p class="pkg-for">For consultants, content creators, and anyone building a personal brand.</p>
+                <p class="pkg-desc">Your voice is your business. Your AI team handles the production so you can focus on the creative.</p>
+                <div class="pkg-ctas">
+                    <a href="#pricing" class="btn btn-coral">Get Started</a>
+                    <a href="#book-call" class="btn btn-ghost">Book a Call</a>
+                </div>
+            </div>
+            <div class="pkg-right">
+                <div class="pkg-list">
+                    <h4>Your agents handle:</h4>
+                    <ul>
+                        <li><span class="ck">&#10003;</span> Content ideation and research</li>
+                        <li><span class="ck">&#10003;</span> Voice calibration. Everything sounds like you</li>
+                        <li><span class="ck">&#10003;</span> Repurposing workflows (long-form &rarr; social &rarr; email)</li>
+                        <li><span class="ck">&#10003;</span> Publishing preparation and scheduling</li>
+                        <li><span class="ck">&#10003;</span> Audience analytics and growth insights</li>
+                    </ul>
+                </div>
+                <div class="pkg-list build-list">
+                    <h4>What you and your agents can build:</h4>
+                    <ul>
+                        <li><span class="ck">&#10003;</span> Your website or portfolio</li>
+                        <li><span class="ck">&#10003;</span> A course platform or membership site</li>
+                        <li><span class="ck">&#10003;</span> A content engine that runs on autopilot</li>
+                        <li><span class="ck">&#10003;</span> Newsletter and email marketing systems</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <p class="pkg-bottom reveal">Don&rsquo;t see yourself? That&rsquo;s okay. <a href="#book-call">Book a call</a> and we&rsquo;ll design a package around you.</p>
+    </div>
+</section>
+
+<!-- IMAGINE WHAT YOU CAN BUILD -->
+<section class="build-s">
+    <div class="build-inner">
+        <div class="build-head reveal">
+            <div class="section-tag tag-green">Build Anything</div>
+            <h2 class="section-h2">Ideas you&rsquo;ve had for years?<br>Your agents can build them.</h2>
+            <p class="section-sub">Every MiMoo package gives you and your agents the tools to bring ideas to life. A website, an app, a tool. Things that used to require a developer are now within reach. You imagine it. Your agents build it.</p>
+        </div>
+
+        <div class="build-grid">
+            <div class="build-card reveal d1">
+                <div class="bci">&#127760;</div>
+                <h4>Business Websites</h4>
+                <p>Lisa&rsquo;s cleaning business went from no online presence to a professional site with the help of her agents.</p>
+            </div>
+            <div class="build-card reveal d2">
+                <div class="bci">&#128241;</div>
+                <h4>Custom Apps</h4>
+                <p>Tom had an idea for a meal planning app. His agents handled the tools and they built it together.</p>
+            </div>
+            <div class="build-card reveal d3">
+                <div class="bci">&#128202;</div>
+                <h4>Dashboards &amp; Tools</h4>
+                <p>David needed a client meeting prep dashboard. His agents had it built and running in days.</p>
+            </div>
+            <div class="build-card reveal d4">
+                <div class="bci">&#129302;</div>
+                <h4>Automation Systems</h4>
+                <p>Margaret&rsquo;s entire email workflow now runs on autopilot. She approves with a thumbs up.</p>
+            </div>
+            <div class="build-card reveal d5">
+                <div class="bci">&#128722;</div>
+                <h4>Online Stores</h4>
+                <p>Denise and her agents launched a vintage resale store across 3 platforms in a weekend.</p>
+            </div>
+            <div class="build-card reveal d6">
+                <div class="bci">&#127891;</div>
+                <h4>Course Platforms</h4>
+                <p>A consultant turned years of expertise into a self-running course site, built by his agents.</p>
+            </div>
+        </div>
+
+        <p class="build-bottom reveal">You don&rsquo;t need to come with an idea. As your agents learn your life, they&rsquo;ll suggest things you never thought possible.</p>
+    </div>
+</section>
+
+<!-- GET AHEAD -->
+<section class="ahead-s">
+    <div class="ahead-inner reveal">
+        <h2 class="section-h2">Everyone&rsquo;s talking about AI.<br>You&rsquo;ll actually be using it.</h2>
+        <p>A year from now, two kinds of people will exist: those who figured out how to use AI, and those who are still thinking about it.</p>
+        <p><strong>MiMoo puts you in the first group. Starting this week.</strong> Not by making you learn new tools. Not by giving you another app to manage. By setting you up with an AI team that works for you while you focus on what matters.</p>
+        <div class="ahead-sign">Start with relief. End with leverage.</div>
+        <a href="#pricing" class="btn btn-coral btn-lg">Get Started</a>
+    </div>
+</section>
+
+<!-- PRICING -->
+<section class="price-s" id="pricing">
+    <div class="price-inner">
+        <div class="price-head reveal">
+            <div class="section-tag tag-coral">Simple Pricing</div>
+            <h2 class="section-h2">One price to start.<br>Personalized from there.</h2>
+            <p class="section-sub">No confusing tiers. MiMoo learns your life and builds a plan that fits. Your plan evolves as your needs change.</p>
+        </div>
+
+        <div class="price-card reveal">
+            <div class="pc-amount">$2,500</div>
+            <div class="pc-label">One-time setup</div>
+            <p class="pc-desc">We study your life, design your AI team, connect your tools, and handle everything. You don&rsquo;t lift a finger.</p>
+            <div class="pc-divider"></div>
+            <p class="pc-monthly-note">After setup, we personalize a monthly plan to your needs. No surprises. Cancel anytime.</p>
+            <ul class="pc-features">
+                <li><span class="ck">&#10003;</span> Full AI agent team, tailored to you</li>
+                <li><span class="ck">&#10003;</span> Real humans managing everything</li>
+                <li><span class="ck">&#10003;</span> Ongoing optimization as you grow</li>
+                <li><span class="ck">&#10003;</span> Build anything you can imagine</li>
+                <li><span class="ck">&#10003;</span> Your plan grows with your needs</li>
+            </ul>
+            <a href="#checkout" class="btn btn-coral btn-lg" style="width:100%">Get Started</a>
+            <a href="#book-call" class="btn btn-ghost" style="width:100%;margin-top:12px;">Talk to Us First</a>
+        </div>
+
+        <p class="price-fine">AI usage costs are billed separately at cost. No markup from us.</p>
+    </div>
+</section>
+
+<!-- TRUST -->
+<section class="trust-s" id="trust">
+    <div class="trust-inner">
+        <div class="trust-head reveal">
+            <div class="section-tag" style="background:rgba(255,255,255,0.3);color:var(--olive);">Safety</div>
+            <h2 class="section-h2">Udderly Reliable.</h2>
+        </div>
+
+        <div class="trust-grid">
+            <div class="trust-card reveal d1">
+                <div class="tc-icon">&#128274;</div>
+                <h4>You approve every action</h4>
+                <p>Nothing sends without your OK. No surprises, ever.</p>
+            </div>
+            <div class="trust-card reveal d2">
+                <div class="tc-icon">&#128737;&#65039;</div>
+                <h4>Your data stays yours</h4>
+                <p>We never sell or share your information. Period.</p>
+            </div>
+            <div class="trust-card reveal d3">
+                <div class="tc-icon">&#128065;&#65039;</div>
+                <h4>Full transparency</h4>
+                <p>See everything your agents see. Nothing hidden.</p>
+            </div>
+            <div class="trust-card reveal d4">
+                <div class="tc-icon">&#128682;</div>
+                <h4>Cancel anytime</h4>
+                <p>No contracts. No lock-in. No guilt.</p>
+            </div>
+            <div class="trust-card reveal d5">
+                <div class="tc-icon">&#129489;&#8205;&#128187;</div>
+                <h4>Real humans</h4>
+                <p>Your AI team is backed by people who care.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="foot-logo">
+        <img src="mascot.png" alt="MiMoo" onerror="this.style.display='none'">
+        <div class="foot-brand">
+            <span class="foot-mark">MiMOO</span>
+            <span class="foot-sub">Udderly Reliable</span>
+        </div>
+    </div>
+    <div class="foot-nav">
+        <a href="#how">How It Works</a>
+        <a href="#packages">Packages</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Contact</a>
+    </div>
+    <p class="foot-copy">&copy; 2026 MiMoo</p>
+</footer>
+
+<script>
+// Scroll reveal
+const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+        if (e.isIntersecting) e.target.classList.add('vis');
+    });
+}, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Briefing animation
+const briefing = document.getElementById('briefing');
+if (briefing) {
+    const briefObs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) {
+                e.target.classList.add('animate');
+                briefObs.unobserve(e.target);
+            }
+        });
+    }, { threshold: 0.3 });
+    briefObs.observe(briefing);
+}
+
+// Nav style on scroll
+const nav = document.getElementById('nav');
+function checkNav() {
+    nav.classList.toggle('scrolled', window.scrollY > 80);
+}
+window.addEventListener('scroll', checkNav, { passive: true });
+checkNav();
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+        const h = this.getAttribute('href');
+        if (h === '#' || h.startsWith('#checkout') || h.startsWith('#book')) return;
+        e.preventDefault();
+        const t = document.querySelector(h);
+        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+});
+
+// Package tabs
+document.querySelectorAll('.pkg-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        const target = tab.dataset.pkg;
+        document.querySelectorAll('.pkg-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.pkg-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('pkg-' + target).classList.add('active');
+    });
+});
+</script>
+
+</body>
+</html>
